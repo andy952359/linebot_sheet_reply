@@ -45,9 +45,6 @@ def callback():
     return "OK"
 
 
-USAGE = "請輸入查詢指令：\n電號 <號碼>\n表號 <號碼>\n例如：電號 100"
-
-
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
     user_input = event.message.text.strip()
@@ -60,14 +57,6 @@ def handle_message(event):
         query = user_input[2:].strip()
         col_index = 2  # B 欄
     else:
-        reply_text = USAGE
-        with ApiClient(configuration) as api_client:
-            MessagingApi(api_client).reply_message(
-                ReplyMessageRequest(
-                    reply_token=event.reply_token,
-                    messages=[TextMessage(text=reply_text)],
-                )
-            )
         return
 
     result = search_by(col_index, query)
