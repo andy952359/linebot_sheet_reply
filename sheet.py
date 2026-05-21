@@ -25,21 +25,22 @@ def _get_sheet():
     return spreadsheet.sheet1  # 使用第一個工作表
 
 
-def search_meter(meter_id: str):
+def search_by(col_index: int, query: str):
     """
-    在 A 欄搜尋電表編號，回傳 (有無讀值, 更新時間) tuple。
-    找不到回傳 None。
+    依指定欄位（col_index，1-based）搜尋，
+    回傳 (電號, 表號, 有無讀值, 更新時間) tuple，找不到回傳 None。
+    欄位結構：A=電號, B=表號, C=有無讀值, D=更新時間
     """
     sheet = _get_sheet()
-    # 取得 A 欄所有電表編號
-    meter_ids = sheet.col_values(1)
+    col_values = sheet.col_values(col_index)
 
-    # 從第 2 列開始搜尋（跳過標題列）
-    for row_index, cell_value in enumerate(meter_ids[1:], start=2):
-        if cell_value.strip() == meter_id.strip():
+    for row_index, cell_value in enumerate(col_values[1:], start=2):
+        if cell_value.strip() == query.strip():
             row = sheet.row_values(row_index)
-            reading_status = row[1] if len(row) > 1 else "（無資料）"
-            update_time = row[2] if len(row) > 2 else "（無資料）"
-            return reading_status, update_time
+            meter_no   = row[0] if len(row) > 0 else "（無資料）"
+            table_no   = row[1] if len(row) > 1 else "（無資料）"
+            reading    = row[2] if len(row) > 2 else "（無資料）"
+            updated_at = row[3] if len(row) > 3 else "（無資料）"
+            return meter_no, table_no, reading, updated_at
 
     return None
